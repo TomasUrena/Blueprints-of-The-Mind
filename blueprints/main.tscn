@@ -1,0 +1,56 @@
+[gd_scene format=3 uid="uid://bm62ndmk54vdr"]
+
+[ext_resource type="Texture2D" uid="uid://c5i4iwnehljcm" path="res://icon.svg" id="1_4bika"]
+[ext_resource type="Script" uid="uid://bdbbmmkh4t3xo" path="res://object.gd" id="2_4bika"]
+
+[sub_resource type="GDScript" id="GDScript_ig7tw"]
+script/source = "extends Node2D
+
+var dragging = false
+var offset = Vector2(0,0)
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	if dragging:
+		position = get_global_mouse_position() - offset
+		
+
+func _on_button_button_up() -> void:
+	dragging = false
+
+func _on_button_button_down() -> void:
+	dragging = true
+	offset = get_global_mouse_position() - global_position
+"
+
+[node name="main" type="Node2D" unique_id=638750390]
+script = SubResource("GDScript_ig7tw")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1821214094]
+position = Vector2(568, 326)
+
+[node name="Object" type="Sprite2D" parent="." unique_id=1904025552]
+position = Vector2(571, 327)
+texture = ExtResource("1_4bika")
+script = ExtResource("2_4bika")
+metadata/_edit_group_ = true
+
+[node name="Button" type="Button" parent="Object" unique_id=2091045417]
+self_modulate = Color(1, 1, 1, 0)
+anchors_preset = -1
+anchor_top = 0.008
+anchor_bottom = 0.008
+offset_left = -64.0
+offset_top = -64.024
+offset_right = 65.00003
+offset_bottom = 63.976
+grow_horizontal = 2
+grow_vertical = 2
+
+[connection signal="button_down" from="Object/Button" to="Object" method="_on_button_button_down"]
+[connection signal="button_up" from="Object/Button" to="Object" method="_on_button_button_up"]
