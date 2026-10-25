@@ -1,5 +1,7 @@
 extends Sprite2D
 
+@onready var sprite: Sprite2D = $"."
+
 var dragging 
 var os = Vector2(0,0)
 
@@ -24,3 +26,12 @@ func _on_button_button_down() -> void:
 
 func _on_button_button_up() -> void:
 	dragging = false
+
+func _rotate() -> void:
+	sprite.rotation_degrees += 90.0
+
+func _vertical() -> void: 
+	sprite.scale = Vector2(1, 1.5) 
+
+func _horizontal() -> void:
+	sprite.scale = Vector2(1.5, 1)

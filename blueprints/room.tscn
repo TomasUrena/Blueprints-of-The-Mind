@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://bjso1cd3wmdsn"]
+
+[ext_resource type="Script" uid="uid://wa4sbv8plihp" path="res://floor.gd" id="1_bisa2"]
+[ext_resource type="Script" uid="uid://bpth5e2u6rshc" path="res://placementmanager.gd" id="2_4o3f6"]
+[ext_resource type="Script" uid="uid://ctalcycbx1wbw" path="res://camera.gd" id="3_4o3f6"]
+[ext_resource type="PackedScene" uid="uid://rfy3ungja78q" path="res://toolbar.tscn" id="4_v5vuv"]
+[ext_resource type="PackedScene" uid="uid://wp323dcbqdyn" path="res://hud.tscn" id="5_ka7wq"]
+
+[node name="ROOM" type="Node2D" unique_id=189346959]
+
+[node name="FLOOR" type="Node2D" parent="." unique_id=346767433]
+script = ExtResource("1_bisa2")
+
+[node name="FURNITURE" type="Node2D" parent="." unique_id=1179746061]
+
+[node name="PLACEMENTMANAGER" type="Node2D" parent="." unique_id=1923202987]
+script = ExtResource("2_4o3f6")
+
+[node name="CAMERA" type="Camera2D" parent="." unique_id=1269587348]
+limit_left = 0
+limit_top = 0
+limit_right = 10000
+limit_bottom = 10000
+script = ExtResource("3_4o3f6")
+
+[node name="TOOLBAR" parent="CAMERA" unique_id=778702165 instance=ExtResource("4_v5vuv")]
+anchors_preset = 9
+anchor_right = 0.0
+offset_left = -576.0
+offset_top = -324.0
+offset_right = -448.0
+offset_bottom = 328.0
+grow_horizontal = 1
+
+[node name="HUD" parent="." unique_id=2061913932 instance=ExtResource("5_ka7wq")]

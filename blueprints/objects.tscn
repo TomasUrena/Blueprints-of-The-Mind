@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://xcbxtqxojoox"]
+
+[ext_resource type="Texture2D" uid="uid://c5i4iwnehljcm" path="res://icon.svg" id="1_wwfwh"]
+[ext_resource type="Script" uid="uid://bj2h6j72wc8e7" path="res://objects.gd" id="2_d2tnk"]
+
+[node name="OBJECTS" type="Sprite2D" unique_id=1003815310]
+texture = ExtResource("1_wwfwh")
+script = ExtResource("2_d2tnk")
+
+[node name="MOVE" type="Button" parent="." unique_id=1850707191]
+self_modulate = Color(1, 0, 0, 1)
+anchors_preset = -1
+offset_left = -55.0
+offset_top = -55.0
+offset_right = 54.867706
+offset_bottom = 54.01599
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="STRETCH_LEFT" type="Button" parent="." unique_id=1543782037]
+offset_left = -63.0
+offset_top = -54.0
+offset_right = -55.0
+offset_bottom = 52.0
+
+[node name="STRETCH_RIGHT" type="Button" parent="." unique_id=1375355049]
+offset_left = 55.0
+offset_top = -55.0
+offset_right = 63.0
+offset_bottom = 51.0
+
+[node name="STRETCH_UP" type="Button" parent="." unique_id=268029604]
+offset_left = -55.0
+offset_top = -65.0
+offset_right = 55.0
+offset_bottom = -56.0
+
+[node name="STRETCH_DOWN" type="Button" parent="." unique_id=1667453261]
+offset_left = -57.0
+offset_top = 52.0
+offset_right = 53.0
+offset_bottom = 61.0
+
+[node name="ROTATE_DR" type="Button" parent="." unique_id=272735031]
+offset_left = 52.0
+offset_top = 51.0
+offset_right = 67.0
+offset_bottom = 66.0
+
+[node name="ROTATE_DL" type="Button" parent="." unique_id=1600905715]
+offset_left = -70.0
+offset_top = 50.0
+offset_right = -55.0
+offset_bottom = 65.0
+
+[node name="ROTATE_UL" type="Button" parent="." unique_id=1325633702]
+offset_left = -68.0
+offset_top = -68.0
+offset_right = -53.0
+offset_bottom = -53.0
+
+[node name="ROTATE_UR" type="Button" parent="." unique_id=1967825756]
+offset_left = 54.0
+offset_top = -69.0
+offset_right = 69.0
+offset_bottom = -54.0
+
+[connection signal="button_down" from="MOVE" to="." method="_on_button_button_down"]
+[connection signal="button_up" from="MOVE" to="." method="_on_button_button_up"]
+[connection signal="pressed" from="STRETCH_LEFT" to="." method="_horizontal"]
+[connection signal="pressed" from="STRETCH_RIGHT" to="." method="_horizontal"]
+[connection signal="pressed" from="STRETCH_UP" to="." method="_vertical"]
+[connection signal="pressed" from="STRETCH_DOWN" to="." method="_vertical"]
+[connection signal="pressed" from="ROTATE_DR" to="." method="_rotate"]
+[connection signal="pressed" from="ROTATE_DL" to="." method="_rotate"]
+[connection signal="pressed" from="ROTATE_UL" to="." method="_rotate"]
+[connection signal="pressed" from="ROTATE_UR" to="." method="_rotate"]
