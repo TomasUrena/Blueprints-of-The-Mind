@@ -11,6 +11,9 @@ const ROOM_SIZE: Vector2 = Vector2(10000,10000)
 func _ready() -> void:
 	position = ROOM_SIZE / 2
 
+var sprint: float = 1.25
+var sprinting: bool = false
+
 func _process(delta: float) -> void:
 	var direction := Vector2.ZERO
 
@@ -28,6 +31,11 @@ func _process(delta: float) -> void:
 
 	if direction != Vector2.ZERO:
 		position += direction.normalized() * move_speed * delta
+		
+	if Input.is_action_pressed("Sprint"):
+		move_speed = 1000
+	else:
+		move_speed = 500
 
 
 func _unhandled_input(event: InputEvent) -> void:

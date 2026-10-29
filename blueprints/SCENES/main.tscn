@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://bm62ndmk54vdr"]
 
-[ext_resource type="Script" uid="uid://d1v3ni0g1btbq" path="res://main.gd" id="1_0xm2m"]
-[ext_resource type="PackedScene" uid="uid://xcbxtqxojoox" path="res://objects.tscn" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://d1v3ni0g1btbq" path="res://SCRIPTS/main.gd" id="1_aqk0q"]
+[ext_resource type="PackedScene" uid="uid://xcbxtqxojoox" path="res://SCENES/objects.tscn" id="2_vrp8q"]
 
 [node name="main" type="Node2D" unique_id=638750390]
-script = ExtResource("1_0xm2m")
+script = ExtResource("1_aqk0q")
 
 [node name="BACKGROUND" type="ColorRect" parent="." unique_id=1973483578]
 offset_left = -8.0
@@ -24,6 +24,6 @@ metadata/_edit_lock_ = true
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1821214094]
 position = Vector2(568, 326)
 
-[node name="OBJECTS" parent="." unique_id=1003815310 instance=ExtResource("1_ig7tw")]
+[node name="OBJECTS" parent="." unique_id=1003815310 instance=ExtResource("2_vrp8q")]
 z_index = 5
 position = Vector2(456, 362)

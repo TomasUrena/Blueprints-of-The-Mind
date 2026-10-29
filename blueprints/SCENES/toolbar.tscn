@@ -17,17 +17,17 @@ metadata/_edit_lock_ = true
 
 [node name="MOVE" type="Button" parent="." unique_id=1857620961]
 layout_mode = 0
-offset_left = 32.0
+offset_left = 24.0
 offset_top = 16.0
-offset_right = 96.0
+offset_right = 104.0
 offset_bottom = 56.0
 text = "MOVE"
 
 [node name="SELECT" type="Button" parent="." unique_id=1555596918]
 layout_mode = 0
-offset_left = 32.0
+offset_left = 24.0
 offset_top = 64.0
-offset_right = 96.0
+offset_right = 104.0
 offset_bottom = 104.0
 text = "SELECT"
 

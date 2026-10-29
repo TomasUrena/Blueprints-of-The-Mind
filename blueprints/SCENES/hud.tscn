@@ -1,34 +1,41 @@
 [gd_scene format=3 uid="uid://wp323dcbqdyn"]
 
-[ext_resource type="Script" uid="uid://d3vd6jj8tk3vt" path="res://hud.gd" id="1_37p78"]
+[ext_resource type="Script" uid="uid://d3vd6jj8tk3vt" path="res://SCRIPTS/hud.gd" id="1_l7brr"]
 
 [node name="HUD" type="CanvasLayer" unique_id=2061913932]
-script = ExtResource("1_37p78")
+script = ExtResource("1_l7brr")
 
 [node name="Control" type="Control" parent="." unique_id=1514790726]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 928.0
+offset_top = 496.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="Control" unique_id=2091644025]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 224.0
+offset_bottom = 152.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control/PanelContainer" unique_id=1840584884]
 layout_mode = 2
+metadata/_edit_lock_ = true
 
 [node name="RoomSize" type="Label" parent="Control/PanelContainer/VBoxContainer" unique_id=1259227630]
 layout_mode = 2
+metadata/_edit_lock_ = true
 
 [node name="SelectedItem" type="Label" parent="Control/PanelContainer/VBoxContainer" unique_id=1348658026]
 layout_mode = 2
+metadata/_edit_lock_ = true
 
 [node name="WIDTH" type="Label" parent="Control/PanelContainer/VBoxContainer" unique_id=1434525728]
 layout_mode = 2
+metadata/_edit_lock_ = true
 
 [node name="DEPTH" type="Label" parent="Control/PanelContainer/VBoxContainer" unique_id=1776470652]
 layout_mode = 2
+metadata/_edit_lock_ = true

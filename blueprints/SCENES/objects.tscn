@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://xcbxtqxojoox"]
 
-[ext_resource type="Texture2D" uid="uid://c5i4iwnehljcm" path="res://icon.svg" id="1_wwfwh"]
-[ext_resource type="Script" uid="uid://bj2h6j72wc8e7" path="res://objects.gd" id="2_d2tnk"]
+[ext_resource type="Texture2D" uid="uid://c5i4iwnehljcm" path="res://icon.svg" id="1_adhn3"]
+[ext_resource type="Script" uid="uid://bj2h6j72wc8e7" path="res://SCRIPTS/objects.gd" id="2_u8j2b"]
 
 [node name="OBJECTS" type="Sprite2D" unique_id=1003815310]
-texture = ExtResource("1_wwfwh")
-script = ExtResource("2_d2tnk")
+texture = ExtResource("1_adhn3")
+script = ExtResource("2_u8j2b")
 
 [node name="MOVE" type="Button" parent="." unique_id=1850707191]
 self_modulate = Color(1, 0, 0, 1)

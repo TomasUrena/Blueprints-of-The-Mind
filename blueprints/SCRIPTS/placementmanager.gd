@@ -37,13 +37,19 @@ func _process(_delta: float) -> void:
 
 	queue_redraw()
 
-
+var _pressed: bool = false
 func _input(event: InputEvent) -> void:
+	if get_viewport().gui_get_hovered_control() != null:
+		return
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			_pressed = event.pressed
 			# Place a furniture item at the snapped position
 			placed_items.append(preview_position)
 			queue_redraw()
+	elif (event is InputEventMouseMotion or event is InputEventKey) and _pressed:
+		placed_items.append(preview_position)
+		queue_redraw()
 
 
 func _draw() -> void:
@@ -51,7 +57,7 @@ func _draw() -> void:
 	for item_pos in placed_items:
 		draw_rect(
 			Rect2(item_pos, ITEM_SIZE),
-			Color("#8b6548")
+			Color.BLACK
 		)
 
 	# Draw translucent placement preview
