@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://rfy3ungja78q"]
 
+[ext_resource type="Script" uid="uid://dpblogjdi8hkg" path="res://SCENES/toolbar.gd" id="1_bjjm2"]
+
 [node name="TOOLBAR" type="Control" unique_id=778702165]
 layout_mode = 3
 anchors_preset = 15
@@ -7,6 +9,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_bjjm2")
 
 [node name="BACKGROUND" type="ColorRect" parent="." unique_id=1025351196]
 layout_mode = 0
@@ -63,13 +66,13 @@ offset_right = 104.0
 offset_bottom = 296.0
 text = "TEXT"
 
-[node name="LINE" type="Button" parent="." unique_id=868823551]
+[node name="DRAW" type="Button" parent="." unique_id=868823551]
 layout_mode = 0
 offset_left = 24.0
 offset_top = 304.0
 offset_right = 104.0
 offset_bottom = 344.0
-text = "LINE"
+text = "DRAW"
 
 [node name="SAVE" type="Button" parent="." unique_id=1185569155]
 layout_mode = 0
@@ -78,3 +81,25 @@ offset_top = 352.0
 offset_right = 104.0
 offset_bottom = 392.0
 text = "SAVE"
+
+[node name="COLOR" type="ColorPickerButton" parent="." unique_id=894272436]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 584.0
+offset_right = 104.0
+offset_bottom = 624.0
+text = "COLOR"
+metadata/_edit_group_ = true
+
+[node name="Label" type="Label" parent="COLOR" unique_id=853037615]
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 40.0
+text = "COLOR"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="SQUARE" to="." method="_on_square_pressed"]
+[connection signal="pressed" from="TEXT" to="." method="_on_text_pressed"]
+[connection signal="pressed" from="DRAW" to="." method="_on_draw_pressed"]
+[connection signal="color_changed" from="COLOR" to="." method="_on_color_color_changed"]

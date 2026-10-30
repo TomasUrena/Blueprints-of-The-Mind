@@ -51,3 +51,5 @@ func _unhandled_input(event: InputEvent) -> void:
 				Vector2.ONE * min_zoom,
 				Vector2.ONE * max_zoom
 			)
+	if event is InputEventMagnifyGesture:
+		zoom = zoom * event.factor

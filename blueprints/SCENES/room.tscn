@@ -31,3 +31,8 @@ anchor_right = 0.0
 offset_right = 128.0
 offset_bottom = 652.0
 grow_horizontal = 1
+
+[connection signal="changedColor" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_changed_color"]
+[connection signal="drawMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_draw_mode"]
+[connection signal="rectMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_rect_mode"]
+[connection signal="textMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_text_mode"]
