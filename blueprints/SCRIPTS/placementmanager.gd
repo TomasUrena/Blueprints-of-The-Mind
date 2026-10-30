@@ -111,7 +111,7 @@ func _input(event: InputEvent) -> void:
 							"color": color
 						})
 			queue_redraw()
-	elif event is InputEventMouseMotion and _pressed:
+	elif (event is InputEventMouseMotion or event is InputEventKey) and _pressed:
 		var point := get_local_mouse_position()
 		placed_items.append({
 							"position": preview_position,
@@ -121,7 +121,7 @@ func _input(event: InputEvent) -> void:
 		if current_line.is_empty() or point.distance_to(current_line[-1]) >= 2.0:
 			current_line.append(point)
 		queue_redraw() 
-	elif event is InputEventMouseMotion and drawing_rectangle:
+	elif (event is InputEventMouseMotion or event is InputEventKey) and drawing_rectangle:
 		rectangle_end = preview_position
 		queue_redraw()
 
