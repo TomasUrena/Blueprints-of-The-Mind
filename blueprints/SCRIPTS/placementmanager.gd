@@ -59,6 +59,7 @@ func _process(_delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	if get_viewport().gui_get_hovered_control() != null:
 		_pressed = false
+		drawing_rectangle = false
 		return
 	if event is InputEventMouseButton:
 		if event.button_index != MOUSE_BUTTON_LEFT:

@@ -33,7 +33,7 @@ func _process(delta: float) -> void:
 		position += direction.normalized() * move_speed * delta
 		
 	if Input.is_action_pressed("Sprint"):
-		move_speed = 1000
+		move_speed = 1500
 	else:
 		move_speed = 500
 
@@ -52,4 +52,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				Vector2.ONE * max_zoom
 			)
 	if event is InputEventMagnifyGesture:
-		zoom = zoom * event.factor
+		zoom = (zoom * event.factor).clamp(
+				Vector2.ONE * min_zoom,
+				Vector2.ONE * max_zoom
+			)
