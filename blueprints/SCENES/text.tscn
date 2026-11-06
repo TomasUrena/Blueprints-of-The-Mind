@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://dhyck2ktry35j"]
+
+[ext_resource type="Script" uid="uid://b421l722ptuy6" path="res://SCRIPTS/text.gd" id="1_lfypm"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eaffh"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[node name="Text" type="Control" unique_id=1704326341]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_lfypm")
+
+[node name="LineEdit" type="LineEdit" parent="." unique_id=187303031]
+layout_mode = 0
+offset_right = 96.0
+offset_bottom = 39.824818
+theme_override_styles/normal = SubResource("StyleBoxFlat_eaffh")
+placeholder_text = "New Label"
+
+[connection signal="text_changed" from="LineEdit" to="." method="_on_line_edit_text_changed"]
+[connection signal="text_submitted" from="LineEdit" to="." method="_on_line_edit_text_submitted"]

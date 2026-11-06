@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://bjso1cd3wmdsn"]
 
+[ext_resource type="Script" uid="uid://oy7p0ykkvxsi" path="res://SCRIPTS/room.gd" id="1_11vys"]
 [ext_resource type="Script" uid="uid://wa4sbv8plihp" path="res://SCRIPTS/floor.gd" id="1_u7wqj"]
 [ext_resource type="Script" uid="uid://bpth5e2u6rshc" path="res://SCRIPTS/placementmanager.gd" id="2_v7c28"]
 [ext_resource type="Script" uid="uid://ctalcycbx1wbw" path="res://SCRIPTS/camera.gd" id="3_iss4j"]
@@ -7,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://rfy3ungja78q" path="res://SCENES/toolbar.tscn" id="5_dxgb3"]
 
 [node name="ROOM" type="Node2D" unique_id=189346959]
+script = ExtResource("1_11vys")
 
 [node name="FLOOR" type="Node2D" parent="." unique_id=346767433]
 script = ExtResource("1_u7wqj")
@@ -32,6 +34,8 @@ offset_right = 128.0
 offset_bottom = 652.0
 grow_horizontal = 1
 
+[connection signal="movement" from="PLACEMENTMANAGER" to="." method="_on_placementmanager_movement"]
+[connection signal="stopCamera" from="PLACEMENTMANAGER" to="." method="_on_placementmanager_stop_camera"]
 [connection signal="changedColor" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_changed_color"]
 [connection signal="drawMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_draw_mode"]
 [connection signal="rectMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_rect_mode"]

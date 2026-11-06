@@ -1,7 +1,7 @@
 
 extends CanvasLayer
 
-@onready var room_size_label: Label = $Control/PanelContainer/VBoxContainer/RoomSize
+#@onready var room_size_label: Label = $Control/PanelContainer/VBoxContainer/RoomSize
 @onready var selected_item_label: Label = $Control/PanelContainer/VBoxContainer/SelectedItem
 @onready var width_label: Label = $Control/PanelContainer/VBoxContainer/WIDTH
 @onready var depth_label: Label = $Control/PanelContainer/VBoxContainer/DEPTH 

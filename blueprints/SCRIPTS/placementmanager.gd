@@ -1,6 +1,9 @@
 
 extends Node2D
 
+signal movement
+signal stopCamera
+
 const CELL_SIZE: int = 32
 const ROOM_SIZE: Vector2 = Vector2(10000, 10000)
 const METERS_PER_CELL: float = 0.5
@@ -89,13 +92,15 @@ func _input(event: InputEvent) -> void:
 					queue_redraw()
 		elif current_mode == ToolMode.TEXT:
 			if event.pressed:
-				placed_labels.append({
-					"position": preview_position,
-					"text": label_text,
-					"color": color
-				})
-
-				queue_redraw()
+				var text_scene = preload("res://SCENES/text.tscn")
+				#var room_scene = preload("res://SCENES/room.tscn")
+				var instance = text_scene.instantiate()
+				instance.update_color(color)
+				instance.update_position(preview_position)
+				instance.update_pretext(label_text)
+				instance.continue_moving.connect(continueMoving)
+				instance.stop_moving.connect(stopMoving)
+				add_child(instance)
 		elif current_mode == ToolMode.DRAW:
 			if event.pressed:
 				_pressed = true
@@ -135,16 +140,6 @@ func _draw() -> void:
 		draw_polyline(current_line, Color.RED, 3.0, true)
 	for item in placed_items:
 		draw_rect(Rect2(item["position"], item["size"]), item["color"])
-	for label in placed_labels:
-		draw_string(
-			ThemeDB.fallback_font,
-			label["position"],
-			label["text"],
-			HORIZONTAL_ALIGNMENT_LEFT,
-			-1,
-			20,
-			label["color"]
-		)
 	if drawing_rectangle:
 		var rect_position := Vector2(
 			minf(rectangle_start.x, rectangle_end.x),
@@ -165,9 +160,14 @@ func _draw() -> void:
 		Color(0.2, 0.7, 0.3, 0.5)
 	)
 
+func continueMoving() -> void:
+	movement.emit()
+	
+func stopMoving() -> void:
+	stopCamera.emit()
 
-func _on_toolbar_changed_color(Color: Variant) -> void:
-	color = Color
+func _on_toolbar_changed_color(newColor: Variant) -> void:
+	color = newColor
 	pass # Replace with function body.
 
 
@@ -184,3 +184,4 @@ func _on_toolbar_text_mode() -> void:
 func _on_toolbar_rect_mode() -> void:
 	current_mode = ToolMode.RECTANGLE
 	pass # Replace with function body.
+	

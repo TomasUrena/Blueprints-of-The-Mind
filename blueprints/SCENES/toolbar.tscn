@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://rfy3ungja78q"]
 
-[ext_resource type="Script" uid="uid://dpblogjdi8hkg" path="res://SCENES/toolbar.gd" id="1_bjjm2"]
+[ext_resource type="Script" uid="uid://dpblogjdi8hkg" path="res://SCRIPTS/toolbar.gd" id="1_bjjm2"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xpkol"]
 bg_color = Color(0, 0, 0, 0)
@@ -297,6 +297,7 @@ offset_left = 16.0
 offset_top = 32.0
 offset_right = 112.0
 offset_bottom = 88.0
+focus_mode = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_xpkol")
@@ -310,6 +311,7 @@ offset_left = 16.0
 offset_top = 104.0
 offset_right = 112.0
 offset_bottom = 160.0
+focus_mode = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_3ru0x")
@@ -323,6 +325,7 @@ offset_left = 16.0
 offset_top = 176.0
 offset_right = 112.0
 offset_bottom = 232.0
+focus_mode = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_yje8i")
@@ -336,6 +339,7 @@ offset_left = 16.0
 offset_top = 248.0
 offset_right = 112.0
 offset_bottom = 304.0
+focus_mode = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_rek46")
@@ -349,6 +353,7 @@ offset_left = 16.0
 offset_top = 320.0
 offset_right = 112.0
 offset_bottom = 376.0
+focus_mode = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_84qxx")
@@ -362,6 +367,7 @@ offset_left = 16.0
 offset_top = 392.0
 offset_right = 112.0
 offset_bottom = 448.0
+focus_mode = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_bd0ma")
@@ -375,6 +381,7 @@ offset_left = 16.0
 offset_top = 464.0
 offset_right = 112.0
 offset_bottom = 520.0
+focus_mode = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_gcptm")
@@ -388,6 +395,7 @@ offset_left = 16.0
 offset_top = 576.0
 offset_right = 112.0
 offset_bottom = 632.0
+focus_mode = 0
 theme_override_styles/normal = SubResource("StyleBoxFlat_11vys")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_33tsw")
 theme_override_styles/hover = SubResource("StyleBoxFlat_bjjm2")

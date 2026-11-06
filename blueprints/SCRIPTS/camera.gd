@@ -8,6 +8,8 @@ extends Camera2D
 
 const ROOM_SIZE: Vector2 = Vector2(10000,10000)
 
+var movement: bool = true
+
 func _ready() -> void:
 	position = ROOM_SIZE / 2
 
@@ -16,7 +18,8 @@ var sprinting: bool = false
 
 func _process(delta: float) -> void:
 	var direction := Vector2.ZERO
-
+	if !movement:
+		return
 	if Input.is_action_pressed("ui_right") or Input.is_key_pressed(KEY_D):
 		direction.x += 1
 
@@ -56,3 +59,15 @@ func _unhandled_input(event: InputEvent) -> void:
 				Vector2.ONE * min_zoom,
 				Vector2.ONE * max_zoom
 			)
+
+
+func _on_placementmanager_stop_moving() -> void:
+	movement = false
+	print("SIGNAL TO CAMERA CONNECTED")
+	pass # Replace with function body.
+	
+func continueMoving() -> void:
+	movement = true
+	
+func stopMoving() -> void:
+	movement = false
