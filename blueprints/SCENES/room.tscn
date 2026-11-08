@@ -37,6 +37,7 @@ grow_horizontal = 1
 [connection signal="movement" from="PLACEMENTMANAGER" to="." method="_on_placementmanager_movement"]
 [connection signal="stopCamera" from="PLACEMENTMANAGER" to="." method="_on_placementmanager_stop_camera"]
 [connection signal="changedColor" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_changed_color"]
+[connection signal="circMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_circ_mode"]
 [connection signal="drawMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_draw_mode"]
 [connection signal="rectMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_rect_mode"]
 [connection signal="textMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_text_mode"]

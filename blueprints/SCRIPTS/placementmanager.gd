@@ -23,7 +23,8 @@ var color: Color
 enum ToolMode {
 	RECTANGLE,
 	TEXT,
-	DRAW
+	DRAW,
+	CIRCLE
 }
 
 var current_mode: ToolMode = ToolMode.DRAW
@@ -34,6 +35,12 @@ var label_text: String = "New Label"
 var drawing_rectangle: bool = false
 var rectangle_start: Vector2 = Vector2.ZERO
 var rectangle_end: Vector2 = Vector2.ZERO
+
+var placed_circles: Array[Dictionary] = []
+
+var drawing_circle: bool = false
+var circle_start: Vector2 = Vector2.ZERO
+var circle_end: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
 	hud.update_room_size(
@@ -117,6 +124,29 @@ func _input(event: InputEvent) -> void:
 							"color": color
 						})
 			queue_redraw()
+		elif current_mode == ToolMode.CIRCLE:
+			if event.pressed:
+				drawing_circle = true
+				circle_start = preview_position
+				circle_end = circle_start
+			else:
+				if drawing_circle:
+					drawing_circle = false
+					var circle_position := Vector2(
+						minf(circle_start.x, circle_end.x),
+						minf(circle_start.y, circle_end.y)
+					)
+					var circle_size := Vector2(
+						absf(circle_end.x - circle_start.x),
+						absf(circle_end.y - circle_start.y)
+					)
+					if circle_size.x > 0 and circle_size.y > 0:
+						placed_circles.append({
+							"position": circle_position,
+							"size": circle_size,
+							"color": color
+						})
+					queue_redraw()
 	elif (event is InputEventMouseMotion or event is InputEventKey) and _pressed:
 		var point := get_local_mouse_position()
 		placed_items.append({
@@ -130,6 +160,9 @@ func _input(event: InputEvent) -> void:
 	elif (event is InputEventMouseMotion or event is InputEventKey) and drawing_rectangle:
 		rectangle_end = preview_position
 		queue_redraw()
+	elif (event is InputEventMouseMotion or event is InputEventKey) and drawing_circle:
+		circle_end = preview_position
+		queue_redraw()
 
 
 func _draw() -> void:
@@ -140,6 +173,20 @@ func _draw() -> void:
 		draw_polyline(current_line, Color.RED, 3.0, true)
 	for item in placed_items:
 		draw_rect(Rect2(item["position"], item["size"]), item["color"])
+	for item in placed_circles:
+		var center = item["position"] + item["size"] / 2.0
+		var radius = item["size"] / 2.0
+		draw_set_transform(center, 0, radius)
+		draw_arc(
+			Vector2.ZERO,
+			1.0,
+			0,
+			TAU,
+			64,
+			item["color"],
+			3.0,
+		)
+		draw_set_transform(Vector2.ZERO)
 	if drawing_rectangle:
 		var rect_position := Vector2(
 			minf(rectangle_start.x, rectangle_end.x),
@@ -155,6 +202,28 @@ func _draw() -> void:
 			Rect2(rect_position, rect_size),
 			Color(color.r, color.g, color.b, 0.5)
 		)
+	if drawing_circle:
+		var circle_position = Vector2(
+			minf(circle_start.x, circle_end.x),
+			minf(circle_start.y, circle_end.y)
+		)
+		var circle_size = Vector2(
+			absf(circle_end.x - circle_start.x),
+			absf(circle_end.y - circle_start.y)
+		)
+		draw_set_transform(circle_position + circle_size / 2.0, 0, circle_size / 2.0)
+		draw_arc(
+			Vector2.ZERO,
+			1.0,
+			0,
+			TAU,
+			64,
+			color,
+			3.0,
+			false
+		)
+		draw_set_transform(Vector2.ZERO)
+	
 	draw_rect(
 		Rect2(preview_position, ITEM_SIZE),
 		Color(0.2, 0.7, 0.3, 0.5)
@@ -185,3 +254,8 @@ func _on_toolbar_rect_mode() -> void:
 	current_mode = ToolMode.RECTANGLE
 	pass # Replace with function body.
 	
+
+
+func _on_toolbar_circ_mode() -> void:
+	current_mode = ToolMode.CIRCLE
+	pass # Replace with function body.

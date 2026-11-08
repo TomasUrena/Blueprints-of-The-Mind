@@ -4,6 +4,7 @@ signal changedColor(Color)
 signal textMode
 signal drawMode
 signal rectMode
+signal circMode
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -33,4 +34,9 @@ func _on_draw_pressed() -> void:
 
 func _on_square_pressed() -> void:
 	rectMode.emit()
+	pass # Replace with function body.
+
+
+func _on_circle_pressed() -> void:
+	circMode.emit()
 	pass # Replace with function body.
