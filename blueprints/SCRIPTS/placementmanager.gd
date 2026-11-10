@@ -124,7 +124,7 @@ func _input(event: InputEvent) -> void:
 				instance.update_pretext(label_text)
 				instance.continue_moving.connect(continueMoving)
 				instance.stop_moving.connect(stopMoving)
-				#add_child(instance)
+				add_child(instance)
 				undo_redo.create_action("Add Text Label")
 				undo_redo.add_do_method(_add_label.bind(instance))
 				undo_redo.add_undo_method(_remove_label.bind(instance))
@@ -189,16 +189,16 @@ func _input(event: InputEvent) -> void:
 
 
 func _draw() -> void:
-	for item in placed_items:
-		draw_rect(Rect2(item["position"], item["size"]), item["color"])
-	for item in current_stroke_items:
-		draw_rect(Rect2(item["position"], item["size"]),item["color"])
 	for item in placed_circles:
 		var center = item["position"] + item["size"] / 2.0
 		var radius = item["size"] / 2.0
 		draw_set_transform(center, 0, radius)
 		draw_arc(Vector2.ZERO,1.0,0,TAU,64,item["color"],3.0,)
 		draw_set_transform(Vector2.ZERO)
+	for item in placed_items:
+		draw_rect(Rect2(item["position"], item["size"]), item["color"])
+	for item in current_stroke_items:
+		draw_rect(Rect2(item["position"], item["size"]),item["color"])
 	if drawing_rectangle:
 		var rect_position := Vector2(
 			minf(rectangle_start.x, rectangle_end.x),
