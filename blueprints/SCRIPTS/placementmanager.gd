@@ -13,7 +13,6 @@ var placed_items: Array[Dictionary] = []
 var preview_position: Vector2 = Vector2.ZERO
 
 var current_line: PackedVector2Array = []
-var finished_lines: Array[PackedVector2Array] = []
 var _pressed: bool = false
 
 @onready var hud = $"../HUD"
@@ -46,6 +45,8 @@ var undo_redo := UndoRedo.new()
 
 var current_stroke_items: Array[Dictionary] = []
 
+var previous_grid_position: Vector2 = Vector2.ZERO 
+
 func _ready() -> void:
 	hud.update_room_size(
 		ROOM_SIZE.x / CELL_SIZE * METERS_PER_CELL,
@@ -74,16 +75,12 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if get_viewport().gui_get_focus_owner() != null:
 			return
-
 		if event.ctrl_pressed or event.meta_pressed:
-			if event.keycode == KEY_Z:
+			if event.is_action_pressed("ui_undo"):
 				undo_action()
 				get_viewport().set_input_as_handled()
 				return
-
-			elif event.keycode == KEY_Y or (
-				event.shift_pressed and event.keycode == KEY_Z
-			):
+			elif event.is_action_pressed("ui_redo"):
 				redo_action()
 				get_viewport().set_input_as_handled()
 				return
@@ -121,7 +118,6 @@ func _input(event: InputEvent) -> void:
 		elif current_mode == ToolMode.TEXT:
 			if event.pressed:
 				var text_scene = preload("res://SCENES/text.tscn")
-				#var room_scene = preload("res://SCENES/room.tscn")
 				var instance = text_scene.instantiate()
 				instance.update_color(color)
 				instance.update_position(preview_position)
@@ -136,30 +132,16 @@ func _input(event: InputEvent) -> void:
 		elif current_mode == ToolMode.DRAW:
 			if event.pressed:
 				_pressed = true
-				current_line.clear()
-				current_stroke_items.clear()
-				current_line.append(
-					preview_position + Vector2(CELL_SIZE / 2.0, CELL_SIZE / 2.0)
+				previous_grid_position = Vector2(
+					floor(preview_position.x / CELL_SIZE),
+					floor(preview_position.y / CELL_SIZE)
 				)
-				current_stroke_items.append({
-					"position": preview_position,
-					"size": ITEM_SIZE,
-					"color": color
-				})
+				add_grid_pixel(previous_grid_position)
 			else:
 				_pressed = false
-			if current_line.size() > 1:
-				add_stroke(
-					current_line.duplicate(),
-					current_stroke_items.duplicate(true)
-				)
-			current_line.clear()
-			current_stroke_items.clear()
-			add_rectangle({
-							"position": preview_position,
-							"size": ITEM_SIZE,
-							"color": color
-						})
+				if current_stroke_items.size() > 0:
+					add_stroke(current_stroke_items.duplicate(true))
+				current_stroke_items.clear()
 			queue_redraw()
 		elif current_mode == ToolMode.CIRCLE:
 			if event.pressed:
@@ -185,23 +167,18 @@ func _input(event: InputEvent) -> void:
 						})
 					queue_redraw()
 	elif (event is InputEventMouseMotion or event is InputEventKey) and _pressed:
-		var point := preview_position + Vector2(
-			CELL_SIZE / 2.0,
-			CELL_SIZE / 2.0
+		var current_grid_position = Vector2(
+			floor(preview_position.x / CELL_SIZE),
+			floor(preview_position.y / CELL_SIZE)
 		)
-		if current_line.is_empty() or point != current_line[-1]:
-			current_line.append(point)
-			current_stroke_items.append({
-				"position": preview_position,
-				"size": ITEM_SIZE,
-				"color": color
-			})
-		
-		add_rectangle({
-			"position": preview_position,
-			"size": ITEM_SIZE,
-			"color": color
-		})
+		if current_grid_position != previous_grid_position:
+			var points = get_grid_line(
+				previous_grid_position,
+				current_grid_position
+			)
+			for point in points:
+				add_grid_pixel(point)
+			previous_grid_position = current_grid_position
 		queue_redraw() 
 	elif (event is InputEventMouseMotion or event is InputEventKey) and drawing_rectangle:
 		rectangle_end = preview_position
@@ -212,41 +189,15 @@ func _input(event: InputEvent) -> void:
 
 
 func _draw() -> void:
-	for line in finished_lines:
-		for point in line:
-			var cell_position := point - Vector2(
-				CELL_SIZE / 2.0,
-				CELL_SIZE / 2.0
-			)
-			draw_rect(
-				Rect2(cell_position, Vector2(CELL_SIZE, CELL_SIZE)),
-				color 
-			)
-	if current_line.size() > 0:
-		for point in current_line:
-			var cell_position := point - Vector2(
-				CELL_SIZE / 2.0,
-				CELL_SIZE / 2.0
-			)
-			draw_rect(
-				Rect2(cell_position, Vector2(CELL_SIZE, CELL_SIZE)),
-				Color.RED
-			)
-	#for item in placed_items:
-	#	draw_rect(Rect2(item["position"], item["size"]), item["color"])
+	for item in placed_items:
+		draw_rect(Rect2(item["position"], item["size"]), item["color"])
+	for item in current_stroke_items:
+		draw_rect(Rect2(item["position"], item["size"]),item["color"])
 	for item in placed_circles:
 		var center = item["position"] + item["size"] / 2.0
 		var radius = item["size"] / 2.0
 		draw_set_transform(center, 0, radius)
-		draw_arc(
-			Vector2.ZERO,
-			1.0,
-			0,
-			TAU,
-			64,
-			item["color"],
-			3.0,
-		)
+		draw_arc(Vector2.ZERO,1.0,0,TAU,64,item["color"],3.0,)
 		draw_set_transform(Vector2.ZERO)
 	if drawing_rectangle:
 		var rect_position := Vector2(
@@ -273,16 +224,7 @@ func _draw() -> void:
 			absf(circle_end.y - circle_start.y)
 		)
 		draw_set_transform(circle_position + circle_size / 2.0, 0, circle_size / 2.0)
-		draw_arc(
-			Vector2.ZERO,
-			1.0,
-			0,
-			TAU,
-			64,
-			color,
-			3.0,
-			false
-		)
+		draw_arc(Vector2.ZERO,1.0,0,TAU,64,color,3.0,false)
 		draw_set_transform(Vector2.ZERO)
 	
 	draw_rect(
@@ -364,30 +306,21 @@ func redo_action() -> void:
 	if undo_redo.has_redo():
 		undo_redo.redo()
 
-func add_stroke(line: PackedVector2Array, items: Array[Dictionary]) -> void:
+func add_stroke(items: Array[Dictionary]) -> void:
 	undo_redo.create_action("Draw Freehand")
-
-	undo_redo.add_do_method(_add_stroke.bind(line, items))
-	undo_redo.add_undo_method(_remove_stroke.bind(line, items))
-
+	undo_redo.add_do_method(_add_stroke.bind(items))
+	undo_redo.add_undo_method(_remove_stroke.bind(items))
 	undo_redo.commit_action()
 
-
-func _add_stroke(line: PackedVector2Array, items: Array[Dictionary]) -> void:
-	finished_lines.append(line)
-
+func _add_stroke(items: Array[Dictionary]) -> void:
 	for item in items:
 		placed_items.append(item)
-
 	queue_redraw()
 
 
-func _remove_stroke(line: PackedVector2Array, items: Array[Dictionary]) -> void:
-	finished_lines.erase(line)
-
+func _remove_stroke(items: Array[Dictionary]) -> void:
 	for item in items:
 		placed_items.erase(item)
-
 	queue_redraw()
 
 func _add_label(instance: Node) -> void:
@@ -396,3 +329,32 @@ func _add_label(instance: Node) -> void:
 
 func _remove_label(instance: Node) -> void:
 	remove_child(instance)
+
+func get_grid_line(start: Vector2, finish: Vector2) -> Array[Vector2]:
+	var points: Array[Vector2] = []
+	var x0 = int(start.x); var y0 = int(start.y)
+	var x1 = int(finish.x); var y1 = int(finish.y)
+	var dx = absi(x1 - x0); var dy = absi(y1 - y0)
+	var sx = 1 if x0 < x1 else -1
+	var sy = 1 if y0 < y1 else -1
+	var error = dx - dy
+	while true:
+		points.append(Vector2(x0, y0))
+		if x0 == x1 and y0 == y1:
+			break
+		var e2 = 2 * error
+		if e2 > -dy:
+			error -= dy
+			x0 += sx
+		if e2 < dx:
+			error += dx
+			y0 += sy
+	return points
+
+func add_grid_pixel(grid_position: Vector2) -> void:
+	var pixel_position = grid_position * CELL_SIZE
+	current_stroke_items.append({
+		"position": pixel_position,
+		"size": Vector2(CELL_SIZE, CELL_SIZE),
+		"color": color
+	})
