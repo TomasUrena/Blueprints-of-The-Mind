@@ -110,6 +110,8 @@ corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
+[sub_resource type="SystemFont" id="SystemFont_5gr64"]
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rek46"]
 bg_color = Color(0.627451, 0.1254902, 0.9411765, 1)
 border_width_left = 5
@@ -145,6 +147,10 @@ corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
+
+[sub_resource type="SystemFont" id="SystemFont_stkrk"]
+font_weight = 800
+font_stretch = 200
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_84qxx"]
 bg_color = Color(1, 0.4117647, 0.7058824, 1)
@@ -182,6 +188,10 @@ corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
+[sub_resource type="SystemFont" id="SystemFont_gcptm"]
+font_weight = 800
+font_stretch = 200
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bd0ma"]
 bg_color = Color(0, 1, 1, 1)
 border_width_left = 5
@@ -217,6 +227,10 @@ corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
+
+[sub_resource type="SystemFont" id="SystemFont_bjjm2"]
+font_weight = 800
+font_stretch = 200
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gcptm"]
 bg_color = Color(1, 1, 0, 1)
@@ -274,6 +288,10 @@ border_width_top = 5
 border_width_right = 5
 border_width_bottom = 5
 border_color = Color(0, 1, 0, 1)
+
+[sub_resource type="SystemFont" id="SystemFont_33tsw"]
+font_weight = 700
+font_stretch = 200
 
 [node name="TOOLBAR" type="Control" unique_id=778702165]
 layout_mode = 3
@@ -342,6 +360,7 @@ offset_bottom = 304.0
 focus_mode = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("SystemFont_5gr64")
 theme_override_styles/normal = SubResource("StyleBoxFlat_rek46")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_73du2")
 theme_override_styles/hover = SubResource("StyleBoxFlat_jr02t")
@@ -356,6 +375,7 @@ offset_bottom = 376.0
 focus_mode = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("SystemFont_stkrk")
 theme_override_styles/normal = SubResource("StyleBoxFlat_84qxx")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_sw6fu")
 theme_override_styles/hover = SubResource("StyleBoxFlat_koujc")
@@ -370,6 +390,7 @@ offset_bottom = 448.0
 focus_mode = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("SystemFont_gcptm")
 theme_override_styles/normal = SubResource("StyleBoxFlat_bd0ma")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_pvgwh")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ecs3w")
@@ -384,6 +405,7 @@ offset_bottom = 520.0
 focus_mode = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("SystemFont_bjjm2")
 theme_override_styles/normal = SubResource("StyleBoxFlat_gcptm")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_stkrk")
 theme_override_styles/hover = SubResource("StyleBoxFlat_5gr64")
@@ -406,6 +428,10 @@ metadata/_edit_group_ = true
 layout_mode = 0
 offset_right = 96.0
 offset_bottom = 56.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_fonts/font = SubResource("SystemFont_33tsw")
 text = "COLOR"
 horizontal_alignment = 1
 vertical_alignment = 1

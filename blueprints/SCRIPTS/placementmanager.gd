@@ -42,6 +42,10 @@ var drawing_circle: bool = false
 var circle_start: Vector2 = Vector2.ZERO
 var circle_end: Vector2 = Vector2.ZERO
 
+var undo_redo := UndoRedo.new() 
+
+var current_stroke_items: Array[Dictionary] = []
+
 func _ready() -> void:
 	hud.update_room_size(
 		ROOM_SIZE.x / CELL_SIZE * METERS_PER_CELL,
@@ -67,6 +71,22 @@ func _process(_delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if get_viewport().gui_get_focus_owner() != null:
+			return
+
+		if event.ctrl_pressed or event.meta_pressed:
+			if event.keycode == KEY_Z:
+				undo_action()
+				get_viewport().set_input_as_handled()
+				return
+
+			elif event.keycode == KEY_Y or (
+				event.shift_pressed and event.keycode == KEY_Z
+			):
+				redo_action()
+				get_viewport().set_input_as_handled()
+				return
 	if get_viewport().gui_get_hovered_control() != null:
 		_pressed = false
 		drawing_rectangle = false
@@ -91,11 +111,12 @@ func _input(event: InputEvent) -> void:
 						absf(rectangle_end.y - rectangle_start.y)
 					)
 					if rect_size.x > 0 and rect_size.y > 0:
-						placed_items.append({
-							"position": rect_position,
-							"size": rect_size,
-							"color": color
-						})
+						if rect_size.x > 0 and rect_size.y > 0:
+							add_rectangle({
+								"position": rect_position,
+								"size": rect_size,
+								"color": color
+							})
 					queue_redraw()
 		elif current_mode == ToolMode.TEXT:
 			if event.pressed:
@@ -107,18 +128,34 @@ func _input(event: InputEvent) -> void:
 				instance.update_pretext(label_text)
 				instance.continue_moving.connect(continueMoving)
 				instance.stop_moving.connect(stopMoving)
-				add_child(instance)
+				#add_child(instance)
+				undo_redo.create_action("Add Text Label")
+				undo_redo.add_do_method(_add_label.bind(instance))
+				undo_redo.add_undo_method(_remove_label.bind(instance))
+				undo_redo.commit_action()
 		elif current_mode == ToolMode.DRAW:
 			if event.pressed:
 				_pressed = true
 				current_line.clear()
-				current_line.append(get_local_mouse_position())
+				current_stroke_items.clear()
+				current_line.append(
+					preview_position + Vector2(CELL_SIZE / 2.0, CELL_SIZE / 2.0)
+				)
+				current_stroke_items.append({
+					"position": preview_position,
+					"size": ITEM_SIZE,
+					"color": color
+				})
 			else:
 				_pressed = false
-				if current_line.size() > 1:
-					finished_lines.append(current_line.duplicate())
-				current_line.clear()
-			placed_items.append({
+			if current_line.size() > 1:
+				add_stroke(
+					current_line.duplicate(),
+					current_stroke_items.duplicate(true)
+				)
+			current_line.clear()
+			current_stroke_items.clear()
+			add_rectangle({
 							"position": preview_position,
 							"size": ITEM_SIZE,
 							"color": color
@@ -141,21 +178,30 @@ func _input(event: InputEvent) -> void:
 						absf(circle_end.y - circle_start.y)
 					)
 					if circle_size.x > 0 and circle_size.y > 0:
-						placed_circles.append({
+						add_circle({
 							"position": circle_position,
 							"size": circle_size,
 							"color": color
 						})
 					queue_redraw()
 	elif (event is InputEventMouseMotion or event is InputEventKey) and _pressed:
-		var point := get_local_mouse_position()
-		placed_items.append({
-							"position": preview_position,
-							"size": ITEM_SIZE,
-							"color": color
-						})
-		if current_line.is_empty() or point.distance_to(current_line[-1]) >= 2.0:
+		var point := preview_position + Vector2(
+			CELL_SIZE / 2.0,
+			CELL_SIZE / 2.0
+		)
+		if current_line.is_empty() or point != current_line[-1]:
 			current_line.append(point)
+			current_stroke_items.append({
+				"position": preview_position,
+				"size": ITEM_SIZE,
+				"color": color
+			})
+		
+		add_rectangle({
+			"position": preview_position,
+			"size": ITEM_SIZE,
+			"color": color
+		})
 		queue_redraw() 
 	elif (event is InputEventMouseMotion or event is InputEventKey) and drawing_rectangle:
 		rectangle_end = preview_position
@@ -167,12 +213,27 @@ func _input(event: InputEvent) -> void:
 
 func _draw() -> void:
 	for line in finished_lines:
-		if line.size() > 1:
-			draw_polyline(line, Color.RED, 3.0, true)
-	if current_line.size() > 1:
-		draw_polyline(current_line, Color.RED, 3.0, true)
-	for item in placed_items:
-		draw_rect(Rect2(item["position"], item["size"]), item["color"])
+		for point in line:
+			var cell_position := point - Vector2(
+				CELL_SIZE / 2.0,
+				CELL_SIZE / 2.0
+			)
+			draw_rect(
+				Rect2(cell_position, Vector2(CELL_SIZE, CELL_SIZE)),
+				color 
+			)
+	if current_line.size() > 0:
+		for point in current_line:
+			var cell_position := point - Vector2(
+				CELL_SIZE / 2.0,
+				CELL_SIZE / 2.0
+			)
+			draw_rect(
+				Rect2(cell_position, Vector2(CELL_SIZE, CELL_SIZE)),
+				Color.RED
+			)
+	#for item in placed_items:
+	#	draw_rect(Rect2(item["position"], item["size"]), item["color"])
 	for item in placed_circles:
 		var center = item["position"] + item["size"] / 2.0
 		var radius = item["size"] / 2.0
@@ -259,3 +320,79 @@ func _on_toolbar_rect_mode() -> void:
 func _on_toolbar_circ_mode() -> void:
 	current_mode = ToolMode.CIRCLE
 	pass # Replace with function body.
+	
+func add_rectangle(item: Dictionary) -> void:
+	undo_redo.create_action("Draw Rectangle")
+	undo_redo.add_do_method(_add_rectangle.bind(item))
+	undo_redo.add_undo_method(_remove_rectangle.bind(item))
+	undo_redo.commit_action()
+
+
+func _add_rectangle(item: Dictionary) -> void:
+	placed_items.append(item)
+	queue_redraw()
+
+
+func _remove_rectangle(item: Dictionary) -> void:
+	placed_items.erase(item)
+	queue_redraw()
+
+
+func add_circle(item: Dictionary) -> void:
+	undo_redo.create_action("Draw Circle")
+	undo_redo.add_do_method(_add_circle.bind(item))
+	undo_redo.add_undo_method(_remove_circle.bind(item))
+	undo_redo.commit_action()
+
+
+func _add_circle(item: Dictionary) -> void:
+	placed_circles.append(item)
+	queue_redraw()
+
+
+func _remove_circle(item: Dictionary) -> void:
+	placed_circles.erase(item)
+	queue_redraw()
+
+
+func undo_action() -> void:
+	if undo_redo.has_undo():
+		undo_redo.undo()
+
+
+func redo_action() -> void:
+	if undo_redo.has_redo():
+		undo_redo.redo()
+
+func add_stroke(line: PackedVector2Array, items: Array[Dictionary]) -> void:
+	undo_redo.create_action("Draw Freehand")
+
+	undo_redo.add_do_method(_add_stroke.bind(line, items))
+	undo_redo.add_undo_method(_remove_stroke.bind(line, items))
+
+	undo_redo.commit_action()
+
+
+func _add_stroke(line: PackedVector2Array, items: Array[Dictionary]) -> void:
+	finished_lines.append(line)
+
+	for item in items:
+		placed_items.append(item)
+
+	queue_redraw()
+
+
+func _remove_stroke(line: PackedVector2Array, items: Array[Dictionary]) -> void:
+	finished_lines.erase(line)
+
+	for item in items:
+		placed_items.erase(item)
+
+	queue_redraw()
+
+func _add_label(instance: Node) -> void:
+	add_child(instance)
+
+
+func _remove_label(instance: Node) -> void:
+	remove_child(instance)
