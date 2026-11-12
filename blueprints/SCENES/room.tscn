@@ -40,4 +40,5 @@ grow_horizontal = 1
 [connection signal="circMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_circ_mode"]
 [connection signal="drawMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_draw_mode"]
 [connection signal="rectMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_rect_mode"]
+[connection signal="save" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_save"]
 [connection signal="textMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_text_mode"]

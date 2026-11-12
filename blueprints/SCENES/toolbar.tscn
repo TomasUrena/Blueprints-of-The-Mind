@@ -436,8 +436,17 @@ text = "COLOR"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="FileDialog" type="FileDialog" parent="." unique_id=33348756]
+oversampling_override = 1.0
+initial_position = 2
+visible = true
+access = 2
+filters = PackedStringArray("*.png", "*.jpg", "*.jpeg", "*.webp")
+
 [connection signal="pressed" from="SQUARE" to="." method="_on_square_pressed"]
 [connection signal="pressed" from="CIRCLE" to="." method="_on_circle_pressed"]
 [connection signal="pressed" from="TEXT" to="." method="_on_text_pressed"]
 [connection signal="pressed" from="DRAW" to="." method="_on_draw_pressed"]
+[connection signal="pressed" from="SAVE" to="." method="_on_save_pressed"]
 [connection signal="color_changed" from="COLOR" to="." method="_on_color_color_changed"]
+[connection signal="confirmed" from="FileDialog" to="." method="_on_file_dialog_confirmed"]

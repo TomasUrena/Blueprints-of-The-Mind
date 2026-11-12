@@ -73,8 +73,6 @@ func _process(_delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
-		if get_viewport().gui_get_focus_owner() != null:
-			return
 		if event.ctrl_pressed or event.meta_pressed:
 			if event.is_action_pressed("ui_undo"):
 				undo_action()
@@ -84,6 +82,8 @@ func _input(event: InputEvent) -> void:
 				redo_action()
 				get_viewport().set_input_as_handled()
 				return
+		elif get_viewport().gui_get_focus_owner() != null:
+			return
 	if get_viewport().gui_get_hovered_control() != null:
 		_pressed = false
 		drawing_rectangle = false
@@ -124,7 +124,7 @@ func _input(event: InputEvent) -> void:
 				instance.update_pretext(label_text)
 				instance.continue_moving.connect(continueMoving)
 				instance.stop_moving.connect(stopMoving)
-				add_child(instance)
+				#add_child(instance)
 				undo_redo.create_action("Add Text Label")
 				undo_redo.add_do_method(_add_label.bind(instance))
 				undo_redo.add_undo_method(_remove_label.bind(instance))
@@ -326,7 +326,6 @@ func _remove_stroke(items: Array[Dictionary]) -> void:
 func _add_label(instance: Node) -> void:
 	add_child(instance)
 
-
 func _remove_label(instance: Node) -> void:
 	remove_child(instance)
 
@@ -358,3 +357,50 @@ func add_grid_pixel(grid_position: Vector2) -> void:
 		"size": Vector2(CELL_SIZE, CELL_SIZE),
 		"color": color
 	})
+
+func save_design(path: String) -> void:
+	var design_data = {
+		"placed_items": placed_items,
+		"current_stroke_items": [],
+		"placed_circles": placed_circles
+	}
+
+	# Convert drawn lines into JSON-compatible arrays
+	for line in current_stroke_items:
+		var points = []
+		for point in line:
+			points.append([point.x, point.y])
+		design_data["finished_lines"].append(points)
+	
+	# Hide the HUD so it isn't included in the image
+	hud.hide()
+
+	await RenderingServer.frame_post_draw
+
+	var image = get_viewport().get_texture().get_image()
+
+	if image.is_empty():
+		print("Error: Image is empty!")
+		hud.show()
+		return
+	var error
+	if path.ends_with(".png"):
+		error = image.save_png(path)
+	elif path.ends_with(".jpg") or path.ends_with(".jpeg"):
+		error = image.save_jpg(path) 
+	elif path.ends_with(".webp"):
+		error = image.save_webp(path)
+		
+	hud.show()
+	
+	if error == OK:
+		print("Image saved successfully!")
+		print("Saved location: ", path)
+		print("Absolute path: ", ProjectSettings.globalize_path(path))
+	else:
+		print("Error saving image: ", error)
+
+
+func _on_toolbar_save(path: String) -> void:
+	save_design(path) 
+	pass # Replace with function body.

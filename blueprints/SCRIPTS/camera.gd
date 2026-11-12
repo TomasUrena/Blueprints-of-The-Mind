@@ -40,26 +40,26 @@ func _process(delta: float) -> void:
 	else:
 		move_speed = 500
 
+var dragging := false
+var last_mouse_position := Vector2.ZERO
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed:
+func _input(event: InputEvent) -> void:
+	if get_viewport().gui_get_hovered_control() != null:
+		return
+	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			zoom = (zoom + Vector2.ONE * zoom_speed).clamp(
-				Vector2.ONE * min_zoom,
-				Vector2.ONE * max_zoom
-			)
-
+			zoom = (zoom + Vector2.ONE * zoom_speed).clamp(Vector2.ONE * min_zoom, Vector2.ONE * max_zoom)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			zoom = (zoom - Vector2.ONE * zoom_speed).clamp(
-				Vector2.ONE * min_zoom,
-				Vector2.ONE * max_zoom
-			)
+			zoom = (zoom - Vector2.ONE * zoom_speed).clamp(Vector2.ONE * min_zoom, Vector2.ONE * max_zoom)
+		elif event.button_index == MOUSE_BUTTON_MIDDLE:
+			dragging = event.pressed
+			last_mouse_position = get_global_mouse_position()
+	if event is InputEventMouseMotion and dragging:
+		position -= event.relative / zoom
+	if event is InputEventPanGesture:
+		position += event.delta / zoom 
 	if event is InputEventMagnifyGesture:
-		zoom = (zoom * event.factor).clamp(
-				Vector2.ONE * min_zoom,
-				Vector2.ONE * max_zoom
-			)
-
+		zoom = (zoom * event.factor).clamp(Vector2.ONE * min_zoom, Vector2.ONE * max_zoom)
 
 func _on_placementmanager_stop_moving() -> void:
 	movement = false
