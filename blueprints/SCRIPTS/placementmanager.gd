@@ -362,9 +362,8 @@ func save_design(path: String) -> void:
 	var design_data = {
 		"placed_items": placed_items,
 		"current_stroke_items": [],
-		"placed_circles": placed_circles
-	}
-
+		"placed_circles": placed_circles}
+	
 	# Convert drawn lines into JSON-compatible arrays
 	for line in current_stroke_items:
 		var points = []
@@ -374,25 +373,33 @@ func save_design(path: String) -> void:
 	
 	# Hide the HUD so it isn't included in the image
 	hud.hide()
-
 	await RenderingServer.frame_post_draw
-
 	var image = get_viewport().get_texture().get_image()
-
 	if image.is_empty():
 		print("Error: Image is empty!")
 		hud.show()
 		return
-	var error
-	if path.ends_with(".png"):
-		error = image.save_png(path)
-	elif path.ends_with(".jpg") or path.ends_with(".jpeg"):
-		error = image.save_jpg(path) 
-	elif path.ends_with(".webp"):
-		error = image.save_webp(path)
-		
-	hud.show()
 	
+	var error
+	
+	# Download through the browser
+	if OS.has_feature("web"):
+		var data
+		if path.ends_with(".png"):
+			data = image.save_png_to_buffer()
+		elif path.ends_with(".jpg") or path.ends_with(".jpeg"):
+			data = image.save_jpg_to_buffer() 
+		elif path.ends_with(".webp"):
+			data = image.save_webp_to_buffer()
+		JavaScriptBridge.download_buffer(data,path)#,"image/png"
+	else:
+		if path.ends_with(".png"):
+			error = image.save_png(path)
+		elif path.ends_with(".jpg") or path.ends_with(".jpeg"):
+			error = image.save_jpg(path) 
+		elif path.ends_with(".webp"):
+			error = image.save_webp(path)
+	hud.show()
 	if error == OK:
 		print("Image saved successfully!")
 		print("Saved location: ", path)
