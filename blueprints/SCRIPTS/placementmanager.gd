@@ -48,26 +48,14 @@ var current_stroke_items: Array[Dictionary] = []
 var previous_grid_position: Vector2 = Vector2.ZERO 
 
 func _ready() -> void:
-	hud.update_room_size(
-		ROOM_SIZE.x / CELL_SIZE * METERS_PER_CELL,
-		ROOM_SIZE.y / CELL_SIZE * METERS_PER_CELL
-	)
+	hud.update_room_size(ROOM_SIZE.x / CELL_SIZE * METERS_PER_CELL, ROOM_SIZE.y / CELL_SIZE * METERS_PER_CELL)
 
 
 func _process(_delta: float) -> void:
 	var mouse_pos := get_local_mouse_position()
-	preview_position = Vector2(
-		floor(mouse_pos.x / CELL_SIZE) * CELL_SIZE,
-		floor(mouse_pos.y / CELL_SIZE) * CELL_SIZE
-	)
-	preview_position.x = clampf(
-		preview_position.x, 0.0,
-		ROOM_SIZE.x - ITEM_SIZE.x
-	)
-	preview_position.y = clampf(
-		preview_position.y, 0.0,
-		ROOM_SIZE.y - ITEM_SIZE.y
-	)
+	preview_position = Vector2(floor(mouse_pos.x / CELL_SIZE) * CELL_SIZE, floor(mouse_pos.y / CELL_SIZE) * CELL_SIZE)
+	preview_position.x = clampf(preview_position.x, 0.0, ROOM_SIZE.x - ITEM_SIZE.x)
+	preview_position.y = clampf(preview_position.y, 0.0, ROOM_SIZE.y - ITEM_SIZE.y)
 	queue_redraw()
 
 
@@ -76,11 +64,11 @@ func _input(event: InputEvent) -> void:
 		if event.ctrl_pressed or event.meta_pressed:
 			if event.is_action_pressed("ui_undo"):
 				undo_action()
-				get_viewport().set_input_as_handled()
+				#get_viewport().set_input_as_handled()
 				return
 			elif event.is_action_pressed("ui_redo"):
 				redo_action()
-				get_viewport().set_input_as_handled()
+				#get_viewport().set_input_as_handled()
 				return
 		elif get_viewport().gui_get_focus_owner() != null:
 			return
@@ -99,14 +87,8 @@ func _input(event: InputEvent) -> void:
 			else:
 				if drawing_rectangle:
 					drawing_rectangle = false
-					var rect_position := Vector2(
-						minf(rectangle_start.x, rectangle_end.x),
-						minf(rectangle_start.y, rectangle_end.y)
-					)
-					var rect_size := Vector2(
-						absf(rectangle_end.x - rectangle_start.x),
-						absf(rectangle_end.y - rectangle_start.y)
-					)
+					var rect_position := Vector2(minf(rectangle_start.x, rectangle_end.x), minf(rectangle_start.y, rectangle_end.y))
+					var rect_size := Vector2(absf(rectangle_end.x - rectangle_start.x), absf(rectangle_end.y - rectangle_start.y))
 					if rect_size.x > 0 and rect_size.y > 0:
 						if rect_size.x > 0 and rect_size.y > 0:
 							add_rectangle({
@@ -124,7 +106,6 @@ func _input(event: InputEvent) -> void:
 				instance.update_pretext(label_text)
 				instance.continue_moving.connect(continueMoving)
 				instance.stop_moving.connect(stopMoving)
-				#add_child(instance)
 				undo_redo.create_action("Add Text Label")
 				undo_redo.add_do_method(_add_label.bind(instance))
 				undo_redo.add_undo_method(_remove_label.bind(instance))
@@ -200,16 +181,8 @@ func _draw() -> void:
 	for item in current_stroke_items:
 		draw_rect(Rect2(item["position"], item["size"]),item["color"])
 	if drawing_rectangle:
-		var rect_position := Vector2(
-			minf(rectangle_start.x, rectangle_end.x),
-			minf(rectangle_start.y, rectangle_end.y)
-		)
-
-		var rect_size := Vector2(
-			absf(rectangle_end.x - rectangle_start.x),
-			absf(rectangle_end.y - rectangle_start.y)
-		)
-
+		var rect_position := Vector2(minf(rectangle_start.x, rectangle_end.x),minf(rectangle_start.y, rectangle_end.y))
+		var rect_size := Vector2(absf(rectangle_end.x - rectangle_start.x), absf(rectangle_end.y - rectangle_start.y))
 		draw_rect(
 			Rect2(rect_position, rect_size),
 			Color(color.r, color.g, color.b, 0.5)
@@ -231,6 +204,7 @@ func _draw() -> void:
 		Rect2(preview_position, ITEM_SIZE),
 		Color(0.2, 0.7, 0.3, 0.5)
 	)
+	#update_viewport_size()
 
 func continueMoving() -> void:
 	movement.emit()
@@ -358,56 +332,43 @@ func add_grid_pixel(grid_position: Vector2) -> void:
 		"color": color
 	})
 
-func save_design(path: String) -> void:
-	var design_data = {
-		"placed_items": placed_items,
-		"current_stroke_items": [],
-		"placed_circles": placed_circles}
-	
-	# Convert drawn lines into JSON-compatible arrays
-	for line in current_stroke_items:
-		var points = []
-		for point in line:
-			points.append([point.x, point.y])
-		design_data["finished_lines"].append(points)
-	
-	# Hide the HUD so it isn't included in the image
-	hud.hide()
-	await RenderingServer.frame_post_draw
-	var image = get_viewport().get_texture().get_image()
-	if image.is_empty():
-		print("Error: Image is empty!")
-		hud.show()
+@onready var sub_viewport: SubViewport = null
+@onready var sub_viewportContainer: SubViewportContainer = null
+var drawing_center: Vector2 = Vector2.ZERO 
+
+func update_viewport_size() -> void:
+	var min_position := Vector2(INF, INF)
+	var max_position := Vector2(-INF, -INF)
+	var has_drawing := false
+	# Rectangles and freehand drawing
+	for item in placed_items:
+		var pos: Vector2 = item["position"]
+		var size: Vector2 = item["size"]
+		min_position.x = minf(min_position.x, pos.x)
+		min_position.y = minf(min_position.y, pos.y)
+		max_position.x = maxf(max_position.x, pos.x + size.x)
+		max_position.y = maxf(max_position.y, pos.y + size.y)
+		has_drawing = true
+	# Circles
+	for item in placed_circles:
+		var pos: Vector2 = item["position"]
+		var size: Vector2 = item["size"]
+		min_position.x = minf(min_position.x, pos.x)
+		min_position.y = minf(min_position.y, pos.y)
+		max_position.x = maxf(max_position.x, pos.x + size.x)
+		max_position.y = maxf(max_position.y, pos.y + size.y)
+		has_drawing = true
+	if not has_drawing:
 		return
+	# Add one grid cell of padding
+	min_position -= Vector2(CELL_SIZE, CELL_SIZE)
+	max_position += Vector2(CELL_SIZE, CELL_SIZE)
 	
-	var error
+	drawing_center = (min_position + max_position) / 2.0
 	
-	# Download through the browser
-	if OS.has_feature("web"):
-		var data
-		if path.ends_with(".png"):
-			data = image.save_png_to_buffer()
-		elif path.ends_with(".jpg") or path.ends_with(".jpeg"):
-			data = image.save_jpg_to_buffer() 
-		elif path.ends_with(".webp"):
-			data = image.save_webp_to_buffer()
-		JavaScriptBridge.download_buffer(data,path)#,"image/png"
-	else:
-		if path.ends_with(".png"):
-			error = image.save_png(path)
-		elif path.ends_with(".jpg") or path.ends_with(".jpeg"):
-			error = image.save_jpg(path) 
-		elif path.ends_with(".webp"):
-			error = image.save_webp(path)
-	hud.show()
-	if error == OK:
-		print("Image saved successfully!")
-		print("Saved location: ", path)
-		print("Absolute path: ", ProjectSettings.globalize_path(path))
-	else:
-		print("Error saving image: ", error)
-
-
-func _on_toolbar_save(path: String) -> void:
-	save_design(path) 
-	pass # Replace with function body.
+	# Calculate the required viewport dimensions
+	var viewport_size := max_position - min_position
+	@warning_ignore("narrowing_conversion")
+	sub_viewport.size = Vector2i(viewport_size.x, viewport_size.y)
+	sub_viewportContainer.size = Vector2(viewport_size.x, viewport_size.y)
+	sub_viewportContainer.position = drawing_center  - Vector2(sub_viewportContainer.size.x / 2.0, sub_viewportContainer.size.y / 2.0)

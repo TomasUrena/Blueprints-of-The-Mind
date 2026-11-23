@@ -51,7 +51,7 @@ func _input(event: InputEvent) -> void:
 			zoom = (zoom + Vector2.ONE * zoom_speed).clamp(Vector2.ONE * min_zoom, Vector2.ONE * max_zoom)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			zoom = (zoom - Vector2.ONE * zoom_speed).clamp(Vector2.ONE * min_zoom, Vector2.ONE * max_zoom)
-		elif event.button_index == MOUSE_BUTTON_MIDDLE:
+		elif event.button_index == MOUSE_BUTTON_MIDDLE or event.button_index == MOUSE_BUTTON_RIGHT:
 			dragging = event.pressed
 			last_mouse_position = get_global_mouse_position()
 	if event is InputEventMouseMotion and dragging:
@@ -61,11 +61,6 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMagnifyGesture:
 		zoom = (zoom * event.factor).clamp(Vector2.ONE * min_zoom, Vector2.ONE * max_zoom)
 
-func _on_placementmanager_stop_moving() -> void:
-	movement = false
-	print("SIGNAL TO CAMERA CONNECTED")
-	pass # Replace with function body.
-	
 func continueMoving() -> void:
 	movement = true
 	

@@ -7,16 +7,48 @@
 [ext_resource type="PackedScene" uid="uid://wp323dcbqdyn" path="res://SCENES/hud.tscn" id="4_ilpgf"]
 [ext_resource type="PackedScene" uid="uid://rfy3ungja78q" path="res://SCENES/toolbar.tscn" id="5_dxgb3"]
 
+[sub_resource type="SystemFont" id="SystemFont_11vys"]
+font_weight = 800
+font_stretch = 200
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i45ra"]
+bg_color = Color(1, 1, 0, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pflo8"]
+bg_color = Color(1, 1, 0, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yiqgn"]
+bg_color = Color(1, 0, 0, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
 [node name="ROOM" type="Node2D" unique_id=189346959]
 script = ExtResource("1_11vys")
-
-[node name="FLOOR" type="Node2D" parent="." unique_id=346767433]
-script = ExtResource("1_u7wqj")
-
-[node name="FURNITURE" type="Node2D" parent="." unique_id=1179746061]
-
-[node name="PLACEMENTMANAGER" type="Node2D" parent="." unique_id=1923202987]
-script = ExtResource("2_v7c28")
 
 [node name="CAMERA" type="Camera2D" parent="." unique_id=1269587348]
 limit_left = 0
@@ -24,6 +56,12 @@ limit_top = 0
 limit_right = 10000
 limit_bottom = 10000
 script = ExtResource("3_iss4j")
+
+[node name="PLACEMENTMANAGER" type="Node2D" parent="." unique_id=1923202987]
+script = ExtResource("2_v7c28")
+
+[node name="FLOOR" type="Node2D" parent="." unique_id=346767433]
+script = ExtResource("1_u7wqj")
 
 [node name="HUD" parent="." unique_id=2061913932 instance=ExtResource("4_ilpgf")]
 
@@ -33,6 +71,22 @@ anchor_right = 0.0
 offset_right = 128.0
 offset_bottom = 652.0
 grow_horizontal = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="SAVE" type="Button" parent="HUD" unique_id=402454594]
+offset_left = 16.0
+offset_top = 480.0
+offset_right = 112.0
+offset_bottom = 536.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("SystemFont_11vys")
+theme_override_styles/normal = SubResource("StyleBoxFlat_i45ra")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pflo8")
+theme_override_styles/hover = SubResource("StyleBoxFlat_yiqgn")
+text = "SAVE"
+metadata/_edit_use_anchors_ = true
 
 [connection signal="movement" from="PLACEMENTMANAGER" to="." method="_on_placementmanager_movement"]
 [connection signal="stopCamera" from="PLACEMENTMANAGER" to="." method="_on_placementmanager_stop_camera"]
@@ -40,5 +94,5 @@ grow_horizontal = 1
 [connection signal="circMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_circ_mode"]
 [connection signal="drawMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_draw_mode"]
 [connection signal="rectMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_rect_mode"]
-[connection signal="save" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_save"]
 [connection signal="textMode" from="HUD/TOOLBAR" to="PLACEMENTMANAGER" method="_on_toolbar_text_mode"]
+[connection signal="pressed" from="HUD/SAVE" to="." method="_on_save_pressed"]
