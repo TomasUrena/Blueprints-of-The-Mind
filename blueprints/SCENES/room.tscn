@@ -13,8 +13,6 @@ script = ExtResource("1_11vys")
 [node name="FLOOR" type="Node2D" parent="." unique_id=346767433]
 script = ExtResource("1_u7wqj")
 
-[node name="FURNITURE" type="Node2D" parent="." unique_id=1179746061]
-
 [node name="PLACEMENTMANAGER" type="Node2D" parent="." unique_id=1923202987]
 script = ExtResource("2_v7c28")
 

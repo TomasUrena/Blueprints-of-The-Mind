@@ -28,7 +28,7 @@ enum ToolMode {
 
 var current_mode: ToolMode = ToolMode.DRAW
 
-var placed_labels: Array[Dictionary] = []
+var placed_labels: Array[Node] = []
 var label_text: String = "New Label"
 
 var drawing_rectangle: bool = false
@@ -124,7 +124,6 @@ func _input(event: InputEvent) -> void:
 				instance.update_pretext(label_text)
 				instance.continue_moving.connect(continueMoving)
 				instance.stop_moving.connect(stopMoving)
-				#add_child(instance)
 				undo_redo.create_action("Add Text Label")
 				undo_redo.add_do_method(_add_label.bind(instance))
 				undo_redo.add_undo_method(_remove_label.bind(instance))
@@ -325,8 +324,10 @@ func _remove_stroke(items: Array[Dictionary]) -> void:
 
 func _add_label(instance: Node) -> void:
 	add_child(instance)
+	placed_labels.append(instance)
 
 func _remove_label(instance: Node) -> void:
+	placed_labels.erase(instance)
 	remove_child(instance)
 
 func get_grid_line(start: Vector2, finish: Vector2) -> Array[Vector2]:
@@ -359,55 +360,149 @@ func add_grid_pixel(grid_position: Vector2) -> void:
 	})
 
 func save_design(path: String) -> void:
-	var design_data = {
-		"placed_items": placed_items,
-		"current_stroke_items": [],
-		"placed_circles": placed_circles}
-	
-	# Convert drawn lines into JSON-compatible arrays
-	for line in current_stroke_items:
-		var points = []
-		for point in line:
-			points.append([point.x, point.y])
-		design_data["finished_lines"].append(points)
-	
-	# Hide the HUD so it isn't included in the image
-	hud.hide()
-	await RenderingServer.frame_post_draw
-	var image = get_viewport().get_texture().get_image()
-	if image.is_empty():
-		print("Error: Image is empty!")
-		hud.show()
+	var bounds := get_drawing_bounds()
+
+	if bounds.size == Vector2.ZERO:
+		print("Nothing to export!")
 		return
+
+	var sub_viewport := SubViewport.new()
+
+	sub_viewport.size = Vector2i(
+		ceil(bounds.size.x),
+		ceil(bounds.size.y)
+	)
+
+	sub_viewport.transparent_bg = true
+	sub_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+
+	add_child(sub_viewport)
+
+	# Create the renderer
+	var renderer = Node2D.new()
+	renderer.set_script(preload("res://SCRIPTS/save.gd"))
+
+	renderer.placed_items = placed_items.duplicate(true)
+	renderer.placed_circles = placed_circles.duplicate(true)
+
+	# Copy text labels into the export renderer.
+	for label in placed_labels:
+		var label_copy = label.duplicate()
+
+		# Prevent the copied label from processing editor input.
+		label_copy.process_mode = Node.PROCESS_MODE_DISABLED
+
+		renderer.add_child(label_copy)
+
+		# Offset the label to match the exported drawing.
+		# Preserve the label's original position.
+		label_copy.position = label.position
+		label_copy.rotation = label.rotation
+		label_copy.scale = label.scale
+
+	# Move the drawing so its top-left corner is at (0, 0).
+	renderer.position = bounds.position
 	
-	var error
-	
-	# Download through the browser
+
+	sub_viewport.add_child(renderer)
+
+	# Wait for rendering
+	await RenderingServer.frame_post_draw
+
+	var image := sub_viewport.get_texture().get_image()
+
+	sub_viewport.queue_free()
+
+	if image.is_empty():
+		print("Image export failed!")
+		return
+
+	# Convert to PNG
+	var data := image.save_png_to_buffer()
+
 	if OS.has_feature("web"):
-		var data
-		if path.ends_with(".png"):
-			data = image.save_png_to_buffer()
-		elif path.ends_with(".jpg") or path.ends_with(".jpeg"):
-			data = image.save_jpg_to_buffer() 
-		elif path.ends_with(".webp"):
-			data = image.save_webp_to_buffer()
-		JavaScriptBridge.download_buffer(data,path)#,"image/png"
+		JavaScriptBridge.download_buffer(data, path.get_file(), "image/png")
 	else:
-		if path.ends_with(".png"):
-			error = image.save_png(path)
-		elif path.ends_with(".jpg") or path.ends_with(".jpeg"):
-			error = image.save_jpg(path) 
-		elif path.ends_with(".webp"):
-			error = image.save_webp(path)
-	hud.show()
-	if error == OK:
-		print("Image saved successfully!")
-		print("Saved location: ", path)
-		print("Absolute path: ", ProjectSettings.globalize_path(path))
-	else:
-		print("Error saving image: ", error)
+		var error := image.save_png(path)
+		if error == OK:
+			print("Image saved successfully!")
+		else:
+			print("Error saving image: ", error)
 
 
 func _on_toolbar_save(path: String) -> void:
 	save_design(path) 
 	pass # Replace with function body.
+
+var drawing_center: Vector2 = Vector2.ZERO 
+
+func get_drawing_bounds() -> Rect2:
+	var min_position := Vector2(INF, INF)
+	var max_position := Vector2(-INF, -INF)
+	var has_drawing := false
+
+	# Rectangles and freehand pixels
+	for item in placed_items:
+		var pos: Vector2 = item["position"]
+		var size: Vector2 = item["size"]
+
+		min_position.x = minf(min_position.x, pos.x)
+		min_position.y = minf(min_position.y, pos.y)
+
+		max_position.x = maxf(max_position.x, pos.x + size.x)
+		max_position.y = maxf(max_position.y, pos.y + size.y)
+
+		has_drawing = true
+
+	# Circles
+	for item in placed_circles:
+		var pos: Vector2 = item["position"]
+		var size: Vector2 = item["size"]
+
+		min_position.x = minf(min_position.x, pos.x)
+		min_position.y = minf(min_position.y, pos.y)
+
+		max_position.x = maxf(max_position.x, pos.x + size.x)
+		max_position.y = maxf(max_position.y, pos.y + size.y)
+
+		has_drawing = true
+
+	# Include text labels
+	for label in placed_labels:
+		if not is_instance_valid(label):
+			continue
+
+		var label_rect: Rect2
+
+		if label is Control:
+			label_rect = label.get_global_rect()
+		elif label is Node2D:
+			label_rect = Rect2(
+				label.global_position,
+				Vector2(1, 1)
+			)
+		else:
+			continue
+
+		# Convert global coordinates into this drawing node's local coordinates.
+		var local_rect := Rect2(
+			to_local(label_rect.position),
+			label_rect.size
+		)
+
+		min_position.x = minf(min_position.x, local_rect.position.x)
+		min_position.y = minf(min_position.y, local_rect.position.y)
+
+		max_position.x = maxf(max_position.x, local_rect.end.x)
+		max_position.y = maxf(max_position.y, local_rect.end.y)
+
+		has_drawing = true
+
+	if not has_drawing:
+		return Rect2()
+
+	# Add padding
+	min_position -= Vector2(CELL_SIZE, CELL_SIZE)
+	max_position += Vector2(CELL_SIZE, CELL_SIZE)
+
+	return Rect2(min_position, max_position - min_position)

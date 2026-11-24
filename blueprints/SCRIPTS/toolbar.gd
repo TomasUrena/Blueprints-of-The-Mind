@@ -12,6 +12,7 @@ signal save(String)
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	$FileDialog.visible = false 
+	#$DRAW.button_down
 	pass # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -48,4 +49,24 @@ func _on_save_pressed() -> void:
 
 func _on_file_dialog_confirmed() -> void:
 	save.emit(save_file_dialog.current_path)
+	pass # Replace with function body.
+
+
+func _on_square_toggled(toggled_on: bool) -> void:
+	if toggled_on:
+		$DRAW.button_pressed = false
+		$CIRCLE.button_pressed = false
+		$TEXT.button_pressed = false
+		rectMode.emit()
+	else:
+		$SQUARE.button_pressed = false
+		$DRAW.button_pressed = true
+		drawMode.emit()
+	pass # Replace with function body.
+	
+
+
+func _on_draw_toggled(toggled_on: bool) -> void:
+	if toggled_on:
+		drawMode.emit()
 	pass # Replace with function body.
