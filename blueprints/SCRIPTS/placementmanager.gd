@@ -401,7 +401,7 @@ func save_design(path: String) -> void:
 		label_copy.scale = label.scale
 
 	# Move the drawing so its top-left corner is at (0, 0).
-	renderer.position = bounds.position
+	renderer.position = -bounds.position
 	
 
 	sub_viewport.add_child(renderer)
